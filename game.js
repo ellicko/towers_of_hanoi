@@ -47,15 +47,63 @@ function updateGameDisplay() {
     gameDisplay.innerHTML = "";
     for (let i = 0; i < game.rods.length; i++) {
         let rod = document.createElement("div");
+        rod.id = "rod" + i; // Assign each rod a unique ID
         for (let j = 0; j < game.rods[i].length; j++) {
             let disk = document.createElement("div");
+            disk.id = "disk" + game.rods[i][j]; // Assign each disk a unique ID
             disk.textContent = game.rods[i][j];
             disk.style.width = game.rods[i][j] * 20 + "px"; // Set the disk width based on the disk number
             disk.style.backgroundColor = game.colors[game.rods[i][j] - 1]; // Set the disk color based on the disk number
+            disk.onclick = function() { clickDisk(disk.id); };
             rod.appendChild(disk);
         }
+        rod.onclick = function() { clickRod(rod.id); };
         gameDisplay.appendChild(rod);
     }
 }
+
+let selectedDisk = null;
+let selectedRod = null;
+
+function clickDisk(diskId) {
+    let diskNum = parseInt(diskId.replace("disk", ""));
+    // Check if the disk is the top disk in its rod
+    for (let i = 0; i < game.rods.length; i++) {
+        if (game.rods[i][game.rods[i].length - 1] === diskNum) {
+            // Unselect the previously selected disk
+            if (selectedDisk !== null) {
+                document.getElementById(selectedDisk).style.border = "";
+            }
+
+            // Select the clicked disk
+            selectedDisk = diskId;
+            selectedRod = i; // Store the rod from which the disk is to be moved
+            document.getElementById(selectedDisk).style.border = "3px solid red";  // Highlight the selected disk
+            break;
+        }
+    }
+    event.stopPropagation(); // Prevent the event from triggering the clickRod function
+}
+
+function clickRod(rodId) {
+    // If a disk is selected, try to move it to the clicked rod
+    if (selectedDisk !== null) {
+        let toRod = parseInt(rodId.replace("rod", "")); // Extract the rod number from the rod ID
+        if (game.moveDisk(selectedRod, toRod)) {
+            // If the move was successful, unselect the disk
+            document.getElementById(selectedDisk).style.border = "";
+            selectedDisk = null;
+            updateGameDisplay(); // Update the game display to reflect the move
+            if (game.checkWin()) {
+                alert("You've won the game!");
+            }
+        } else {
+            alert("Invalid move!");
+        }
+    }
+}
+
+
+
 
 updateGameDisplay();
