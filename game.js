@@ -3,6 +3,7 @@ class TowerOfHanoi {
         this.numDisks = numDisks;
         this.rods = [[], [], []];
         this.colors = ["blue", "red", "green"]; // Array of colors
+        this.moves = 0; // Move counter
         for (let i = numDisks; i > 0; i--) {
             this.rods[0].push(i);
         }
@@ -14,6 +15,7 @@ class TowerOfHanoi {
         }
         if (this.rods[toRod].length === 0 || this.rods[toRod][this.rods[toRod].length - 1] > this.rods[fromRod][this.rods[fromRod].length - 1]) {
             this.rods[toRod].push(this.rods[fromRod].pop());
+            this.moves++;
             return true;
         }
         return false;
@@ -59,8 +61,22 @@ function updateGameDisplay() {
         }
         rod.onclick = function() { clickRod(rod.id); };
         gameDisplay.appendChild(rod);
+
+        let moveCounter = document.getElementById("move-counter");
+        if (!moveCounter) {
+            moveCounter = document.createElement("div");
+            moveCounter.id = "move-counter";
+            document.body.appendChild(moveCounter);
+        }
+        moveCounter.textContent = `Moves: ${game.moves} | Minimum moves: ${Math.pow(2, game.numDisks) - 1}`;
     }
 }
+
+function resetGame() {
+    game = new TowerOfHanoi(3);  // Adjust the number of disks as needed
+    updateGameDisplay();
+}
+
 
 let selectedDisk = null;
 let selectedRod = null;
@@ -89,13 +105,22 @@ function clickRod(rodId) {
     // If a disk is selected, try to move it to the clicked rod
     if (selectedDisk !== null) {
         let toRod = parseInt(rodId.replace("rod", "")); // Extract the rod number from the rod ID
+        if (selectedRod === toRod) {
+            return; // If the selected rod is the same as the clicked rod, do nothing
+        }
         if (game.moveDisk(selectedRod, toRod)) {
             // If the move was successful, unselect the disk
             document.getElementById(selectedDisk).style.border = "";
             selectedDisk = null;
             updateGameDisplay(); // Update the game display to reflect the move
             if (game.checkWin()) {
-                alert("You've won the game!");
+                let winSound = new Audio('winsound.wav');
+                winSound.play();
+                let modal = document.getElementById("modal");
+                modal.style.display = "block";
+                document.getElementById("close-modal").onclick = function() {
+                    modal.style.display = "none";
+                }
             }
         } else {
             alert("Invalid move!");
@@ -103,7 +128,6 @@ function clickRod(rodId) {
     }
 }
 
-
-
+document.getElementById("restart-button").addEventListener("click", resetGame);
 
 updateGameDisplay();

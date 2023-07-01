@@ -7,11 +7,22 @@
 <body>
     <div id="rules">
         <h2>Rules of the Game:</h2>
+        <p>The aim of the game is to move all the disks from the leftmost rod to the rightmost rod, obeying the following rules:</p>
         <p>1. Only one disk can be moved at a time.</p>
         <p>2. Each move consists of taking the upper disk from one of the stacks and placing it on top of another stack or on an empty rod.</p>
         <p>3. No disk may be placed on top of a smaller disk.</p>
     </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+          <h2>Congratulations!</h2>
+          <p>You've won the game!</p>
+          <button id="close-modal">Close</button>
+        </div>
+      </div>
+      
     <div id="game"></div>
+    <button id="restart-button">Restart</button>
     <script src="game.js"></script>
 </body>
 </html>
